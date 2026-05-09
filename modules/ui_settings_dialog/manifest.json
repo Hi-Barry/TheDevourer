@@ -1,0 +1,28 @@
+{
+  "name": "ui_settings_dialog",
+  "version": "1.0.0",
+  "description": "设置对话框 — 常规/LLM/关于",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "config",
+      "logger"
+    ],
+    "modules": []
+  },
+  "entry_points": {
+    "classes": [
+      "SettingsDialog"
+    ],
+    "functions": [
+      "plugin_load",
+      "plugin_unload",
+      "create_settings_dialog"
+    ]
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

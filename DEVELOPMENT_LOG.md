@@ -174,3 +174,44 @@
 - [ ] **GitHub Releases**：CI/CD 自动构建 exe
 - [ ] **正式精灵素材**：替换占位色块图为专业美术资源
 - [ ] **macOS/Linux 支持**：验证跨平台兼容性
+
+---
+
+## v2.0.0 — 2026-05-11 插件化架构重构
+
+### 重构动机
+
+原单体架构将所有代码打包为一个 exe，模块耦合严重，无法单独升级。用户需求：像 Windows DLL 一样，每个模块独立打包，主程序动态加载，升级无需重新下载整个应用。
+
+### 架构变化
+
+| 维度 | v1.0 单体 | v2.0 插件化 |
+|------|-----------|-------------|
+| 分层 | 单层扁平 | Core 核心层 + Functional 功能层 + UI 层 |
+| 加载 | main.py 直接 import | ModuleLoader 动态 importlib 加载 |
+| 通信 | 模块间直接 import | SignalBus 发布/订阅解耦 |
+| 打包 | 全量 exe | 每个模块独立 .zip |
+| 升级 | 重新下载 exe | 替换单个模块 .zip 即可 |
+
+### 新增组件
+
+**SignalBus**：全局事件总线，subscribe/publish/unsubscribe/clear_module 四方法，16 个预定义事件（feed/received、file/classified、qa/token 等）。
+
+**ModuleLoader**：扫描 plugins/ → 读取 manifest → 校验依赖 → 拓扑排序 → importlib 加载 → 注册 entry_points。支持目录和 .zip 两种形态。
+
+**manifest_validator**：校验 11 个必填字段、semver 版本号、模块名、hooks 声明、dependencies 格式。
+
+**pack_module.py**：tools/pack_module.py 打包工具，输出 {name}_v{version}.zip + .sha256。
+
+### 模块清单
+
+12 个模块，每个含 manifest.json + __init__.py：
+- 功能模块（7）：feed_handler、file_classifier、content_classifier、storage_manager、chroma_client、file_watcher、kb_qa
+- UI 模块（5）：ui_pet_window、ui_content_browser、ui_question_dialog、ui_settings_dialog、ui_tray
+
+### 测试增长
+
+| 版本 | 测试文件 | 测试用例 | 覆盖率 |
+|------|---------|---------|--------|
+| v1.0 | 10 个 | 100 条 | 10 个模块 |
+| v2.0 | 28 个 | ≥180 条 | 10 个模块 + 7 组插件 + SignalBus + ModuleLoader + manifest + pack_module + upgrade |

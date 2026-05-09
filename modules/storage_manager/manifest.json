@@ -1,0 +1,30 @@
+{
+  "name": "storage_manager",
+  "version": "1.0.0",
+  "description": "存储引擎 — 入库/去重/FTS5/ChromaDB 混合搜索",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "config",
+      "db",
+      "chroma_client",
+      "logger",
+      "signal_bus"
+    ],
+    "modules": [
+      "file_classifier>=1.0",
+      "content_classifier>=1.0"
+    ]
+  },
+  "entry_points": {
+    "classes": [
+      "StorageManager"
+    ],
+    "functions": []
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

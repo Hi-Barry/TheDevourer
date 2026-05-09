@@ -1,0 +1,31 @@
+{
+  "name": "ui_tray",
+  "version": "1.0.0",
+  "description": "系统托盘 — 图标+菜单+开机启动",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "config",
+      "logger",
+      "signal_bus"
+    ],
+    "modules": [
+      "ui_pet_window>=1.0",
+      "ui_content_browser>=1.0",
+      "ui_settings_dialog>=1.0"
+    ]
+  },
+  "entry_points": {
+    "classes": [],
+    "functions": [
+      "plugin_load",
+      "plugin_unload",
+      "create_tray_icon"
+    ]
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

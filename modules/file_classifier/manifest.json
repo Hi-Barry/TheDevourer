@@ -1,0 +1,25 @@
+{
+  "name": "file_classifier",
+  "version": "1.0.0",
+  "description": "文件类型识别 — MIME+元数据+OCR 降级",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "config",
+      "logger"
+    ],
+    "modules": []
+  },
+  "entry_points": {
+    "classes": [
+      "FileClassifier",
+      "FileInfo"
+    ],
+    "functions": []
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

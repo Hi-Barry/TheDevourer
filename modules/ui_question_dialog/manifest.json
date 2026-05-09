@@ -1,0 +1,31 @@
+{
+  "name": "ui_question_dialog",
+  "version": "1.0.0",
+  "description": "知识库提问对话框 — 流式回答显示",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "config",
+      "logger",
+      "signal_bus"
+    ],
+    "modules": [
+      "kb_qa>=1.0"
+    ]
+  },
+  "entry_points": {
+    "classes": [
+      "QuestionDialog"
+    ],
+    "functions": [
+      "plugin_load",
+      "plugin_unload",
+      "create_question_dialog"
+    ]
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

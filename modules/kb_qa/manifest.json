@@ -1,0 +1,31 @@
+{
+  "name": "kb_qa",
+  "version": "1.0.0",
+  "description": "知识库问答 — RAG 检索+LLM 推理",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "db",
+      "chroma_client",
+      "config",
+      "logger"
+    ],
+    "modules": [
+      "chroma_client>=1.0",
+      "file_classifier>=1.0"
+    ]
+  },
+  "entry_points": {
+    "classes": [
+      "KbQA"
+    ],
+    "functions": [
+      "create_kb_qa"
+    ]
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

@@ -1,0 +1,27 @@
+{
+  "name": "file_watcher",
+  "version": "1.0.0",
+  "description": "文件监听 — watchdog 自动索引",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "logger",
+      "signal_bus"
+    ],
+    "modules": [
+      "storage_manager>=1.0"
+    ]
+  },
+  "entry_points": {
+    "classes": [
+      "FileWatcher",
+      "RepoWatcherHandler"
+    ],
+    "functions": []
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

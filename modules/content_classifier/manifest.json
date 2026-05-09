@@ -1,0 +1,26 @@
+{
+  "name": "content_classifier",
+  "version": "1.0.0",
+  "description": "内容分类 — 扩展名/域名/关键词规则",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "logger",
+      "signal_bus"
+    ],
+    "modules": [
+      "file_classifier>=1.0"
+    ]
+  },
+  "entry_points": {
+    "classes": [
+      "ContentClassifier"
+    ],
+    "functions": []
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

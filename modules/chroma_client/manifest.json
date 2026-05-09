@@ -1,0 +1,25 @@
+{
+  "name": "chroma_client",
+  "version": "1.0.0",
+  "description": "ChromaDB 向量存储客户端",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "logger"
+    ],
+    "modules": []
+  },
+  "entry_points": {
+    "classes": [
+      "ChromaClient"
+    ],
+    "functions": [
+      "init_chroma"
+    ]
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

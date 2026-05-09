@@ -1,0 +1,34 @@
+{
+  "name": "ui_pet_window",
+  "version": "1.0.0",
+  "description": "精灵悬浮窗 — 透明窗口+拖拽+动画",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "config",
+      "logger",
+      "signal_bus"
+    ],
+    "modules": []
+  },
+  "entry_points": {
+    "classes": [
+      "PetWindow",
+      "FeedBubble",
+      "SpriteAnimator"
+    ],
+    "functions": [
+      "plugin_load",
+      "plugin_unload",
+      "create_pet_window"
+    ]
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": [
+    "resources/pet_idle.png",
+    "resources/anim/"
+  ]
+}

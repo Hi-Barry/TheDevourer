@@ -84,50 +84,77 @@ python -m pytest tests/ -v
 
 ```
 TheDevourer/
-├── core/                  # 核心引擎
+├── core/                  # 核心层（内置，不可拆分）
 │   ├── config.py          # 配置管理（QSettings）
 │   ├── db.py              # SQLite + FTS5 数据库
-│   ├── chroma_client.py   # ChromaDB 向量客户端
-│   ├── feed_handler.py    # 投喂队列（拖拽/粘贴/URL）
-│   ├── file_classifier.py # 文件类型识别 + 元数据提取
+│   ├── logger.py          # 日志模块
+│   ├── signal_bus.py      # 信号总线（模块间通信）
+│   ├── manifest_validator.py  # manifest.json 校验器
+│   ├── module_loader.py   # 插件模块加载器
+│   ├── chroma_client.py   # ChromaDB 向量客户端（内置）
+│   ├── feed_handler.py    # 投喂队列
+│   ├── file_classifier.py # 文件类型识别
 │   ├── content_classifier.py # 规则分类引擎
 │   ├── storage_manager.py # 存储 + 双引擎搜索
-│   ├── file_watcher.py    # 文件监听 + 自动索引
-│   ├── kb_qa.py           # RAG 知识库问答
-│   └── logger.py          # 日志模块
-├── ui/                    # 界面组件
-│   ├── pet_window.py      # 精灵悬浮窗
-│   ├── feed_bubble.py     # 投喂反馈气泡
-│   ├── sprite_animator.py # 帧动画引擎
-│   ├── question_dialog.py # 知识库提问界面
-│   ├── content_browser.py # 内容浏览器
-│   └── settings_dialog.py # 设置对话框
+│   ├── file_watcher.py    # 文件监听
+│   └── kb_qa.py           # RAG 知识库问答
+├── modules/               # 可独立打包的功能模块
+│   ├── feed_handler/      # 投喂处理（manifest + __init__）
+│   ├── file_classifier/   # 文件类型识别
+│   ├── content_classifier/ # 内容分类
+│   ├── storage_manager/   # 存储引擎
+│   ├── chroma_client/     # 向量客户端
+│   ├── file_watcher/      # 文件监听
+│   ├── kb_qa/             # 知识库问答
+│   ├── ui_pet_window/     # 精灵悬浮窗
+│   ├── ui_content_browser/ # 内容浏览器
+│   ├── ui_question_dialog/ # 提问对话框
+│   ├── ui_settings_dialog/ # 设置对话框
+│   └── ui_tray/           # 系统托盘
+├── plugins/               # 打包后的 .zip 模块（运行期加载）
+│   ├── updates/           # 新版本模块
+│   └── backups/           # 升级备份
+├── tools/                 # 构建工具
+│   └── pack_module.py     # 模块独立打包脚本
+├── outputs/               # 模块打包产物
+│   └── *.zip + *.sha256
 ├── resources/             # 资源文件
-│   ├── pet_idle.png       # 精灵占位图
-│   └── anim/              # 6 状态帧动画
-│       ├── idle/          # 待机（4 帧）
-│       ├── hungry/        # 张嘴（3 帧）
-│       ├── eating/        # 咀嚼（5 帧）
-│       ├── happy/         # 开心（3 帧）
-│       ├── thinking/      # 思考（4 帧）
-│       └── error/         # 摇头（3 帧）
-├── memory/                # 千语的运行日志
-├── tests/                 # pytest 测试套件
-│   ├── conftest.py        # 共享 fixtures
-│   ├── test_config.py     # 10 条 ✅
-│   ├── test_db.py         # 11 条 ✅
-│   ├── test_chroma_client.py # 6 条 ✅
-│   ├── test_logger.py     # 5 条 ✅
-│   ├── test_feed_handler.py  # 10 条 ✅
-│   ├── test_file_classifier.py # 15 条 ✅
-│   ├── test_content_classifier.py # 15 条 ✅
-│   ├── test_storage_manager.py # 12 条 ✅
-│   ├── test_file_watcher.py # 8 条 ✅
-│   └── test_kb_qa.py      # 8 条 ✅
-├── DESIGN.md              # 功能设计文档
-├── MODELS.md              # 数据模型文档
-├── INSTALL.md             # 安装说明
-├── README.md              # 本文件
+│   ├── pet_idle.png
+│   └── anim/              # 6 状态帧动画（22 帧）
+├── tests/                 # 测试套件（28 个文件，≥180 条）
+│   ├── test_config.py             # Config 全属性  ✅
+│   ├── test_db.py                 # 数据库 CRUD  ✅
+│   ├── test_chroma_client.py      # 向量客户端  ✅
+│   ├── test_logger.py             # 日志模块  ✅
+│   ├── test_feed_handler.py       # 投喂逻辑  ✅
+│   ├── test_file_classifier.py    # 文件识别  ✅
+│   ├── test_content_classifier.py # 内容分类  ✅
+│   ├── test_storage_manager.py    # 存储引擎  ✅
+│   ├── test_file_watcher.py       # 文件监听  ✅
+│   ├── test_kb_qa.py              # 知识库问答  ✅
+│   ├── test_signal_bus.py         # 信号总线  ✅
+│   ├── test_manifest.py           # manifest 校验  ✅
+│   ├── test_module_loader.py      # 加载器  ✅
+│   ├── test_main_launcher.py      # 启动链  ✅
+│   ├── test_pack_module.py        # 打包脚本  ✅
+│   ├── test_upgrade.py            # 热升级  ✅
+│   ├── test_plugin_feed_handler.py       ✅
+│   ├── test_plugin_file_classifier.py    ✅
+│   ├── test_plugin_content_classifier.py ✅
+│   ├── test_plugin_storage_manager.py    ✅
+│   ├── test_plugin_chroma_client.py      ✅
+│   ├── test_plugin_file_watcher.py       ✅
+│   ├── test_plugin_kb_qa.py             ✅
+│   ├── test_plugin_ui_pet_window.py     ✅
+│   ├── test_plugin_ui_content_browser.py ✅
+│   ├── test_plugin_ui_question_dialog.py ✅
+│   ├── test_plugin_ui_settings_dialog.py ✅
+│   └── test_plugin_ui_tray.py           ✅
+├── DESIGN.md / MODELS.md / PLUGIN_ARCH.md  # 设计文档
+├── INSTALL.md / README.md / DEVELOPMENT_LOG.md
+├── requirements.txt
+└── main.py                # 轻量启动器
+```
 ├── requirements.txt       # Python 依赖
 └── main.py                # 程序入口
 ```

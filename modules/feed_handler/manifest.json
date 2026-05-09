@@ -1,0 +1,33 @@
+{
+  "name": "feed_handler",
+  "version": "1.0.0",
+  "description": "投喂处理 — 拖拽/粘贴/URL 识别",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "config",
+      "logger",
+      "signal_bus"
+    ],
+    "modules": []
+  },
+  "entry_points": {
+    "classes": [
+      "FeedItem",
+      "FeedSourceType",
+      "FeedQueueWorker"
+    ],
+    "functions": [
+      "extract_urls",
+      "is_url",
+      "fetch_url_title",
+      "compute_md5",
+      "parse_mime_data"
+    ]
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}

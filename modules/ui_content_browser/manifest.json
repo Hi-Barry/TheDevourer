@@ -1,0 +1,31 @@
+{
+  "name": "ui_content_browser",
+  "version": "1.0.0",
+  "description": "内容浏览器 — 分类树+搜索+右键",
+  "min_core_version": "1.0.0",
+  "dependencies": {
+    "core": [
+      "config",
+      "db",
+      "signal_bus"
+    ],
+    "modules": [
+      "storage_manager>=1.0"
+    ]
+  },
+  "entry_points": {
+    "classes": [
+      "ContentBrowser"
+    ],
+    "functions": [
+      "plugin_load",
+      "plugin_unload",
+      "create_content_browser"
+    ]
+  },
+  "hooks": {
+    "on_load": "plugin_load",
+    "on_unload": "plugin_unload"
+  },
+  "resources": []
+}
