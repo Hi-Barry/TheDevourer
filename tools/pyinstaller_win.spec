@@ -1,6 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""TheDevourer — Windows PyInstaller 打包配置"""
-import sys
+"""TheDevourer — Windows PyInstaller 打包配置（简化版）"""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -10,41 +9,32 @@ a = Analysis(
     pathex=[str(ROOT)],
     binaries=[],
     datas=[
-        # 精灵图片
         (str(ROOT / 'resources' / 'pet_idle.png'), 'resources'),
-        # 动画帧
-        (str(ROOT / 'resources' / 'anim'), 'resources/anim'),
-        # 核心模块
-        (str(ROOT / 'core'), 'core'),
-        # UI 模块
-        (str(ROOT / 'ui'), 'ui'),
-        # 插件模块（开发模式：从 modules/ 目录打包）
-        (str(ROOT / 'modules'), 'modules'),
-        # 存储模块
-        (str(ROOT / 'storage'), 'storage'),
-        (str(ROOT / 'knowledge_base'), 'knowledge_base'),
+        (str(ROOT / 'resources' / 'anim' / 'idle'), 'resources/anim/idle'),
+        (str(ROOT / 'resources' / 'anim' / 'hungry'), 'resources/anim/hungry'),
+        (str(ROOT / 'resources' / 'anim' / 'eating'), 'resources/anim/eating'),
+        (str(ROOT / 'resources' / 'anim' / 'happy'), 'resources/anim/happy'),
+        (str(ROOT / 'resources' / 'anim' / 'thinking'), 'resources/anim/thinking'),
+        (str(ROOT / 'resources' / 'anim' / 'error'), 'resources/anim/error'),
     ],
     hiddenimports=[
-        # PySide6
         'PySide6.QtCore', 'PySide6.QtGui', 'PySide6.QtWidgets',
         'PySide6.QtNetwork', 'PySide6.QtSvg',
-        # 文档处理
         'docx', 'openpyxl', 'pptx', 'PyPDF2', 'pdfplumber',
         'PIL', 'PIL._imaging',
-        # 网络
-        'httpx', 'urllib3', 'certifi',
-        'bs4', 'openai',
-        # 数据
-        'yaml', 'chardet', 'json',
-        # 系统
-        'watchdog',
+        'httpx', 'urllib3', 'certifi', 'bs4', 'openai',
+        'yaml', 'chardet', 'watchdog',
         'chromadb', 'sqlite3',
+        'core.config', 'core.logger', 'core.db', 'core.signal_bus',
+        'core.manifest_validator', 'core.module_loader',
+        'core.chroma_client', 'core.feed_handler',
+        'core.file_classifier', 'core.content_classifier',
+        'core.storage_manager', 'core.file_watcher', 'core.kb_qa',
+        'ui.pet_window', 'ui.feed_bubble', 'ui.sprite_animator',
+        'ui.content_browser', 'ui.question_dialog',
+        'ui.settings_dialog',
     ],
-    hookspath=[],
-    hooksconfig={},
-    runtime_hooks=[],
     excludes=[
-        # 排除不需要的 Qt 模块（减体积 ~100MB）
         'PySide6.QtQml', 'PySide6.QtQuick', 'PySide6.QtQuickWidgets',
         'PySide6.Qt3DCore', 'PySide6.Qt3DRender', 'PySide6.Qt3DInput',
         'PySide6.Qt3DExtras', 'PySide6.QtCharts', 'PySide6.QtDataVisualization',
@@ -54,16 +44,11 @@ a = Analysis(
         'PySide6.QtBluetooth', 'PySide6.QtNfc',
         'PySide6.QtSensors', 'PySide6.QtSerialPort',
         'PySide6.QtPositioning', 'PySide6.QtLocation',
-        # 不需要的依赖
         'numpy', 'scipy', 'matplotlib', 'pandas',
         'torch', 'tensorflow', 'transformers',
         'notebook', 'jupyter', 'ipython',
         'tkinter', 'unittest', 'pdb',
     ],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=None,
-    noarchive=False,
 )
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=None)
@@ -77,16 +62,10 @@ exe = EXE(
     [],
     name='TheDevourer',
     debug=False,
-    bootloader_ignore_signals=False,
     strip=True,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
-    console=False,              # 不显示控制台窗口
+    console=False,
     disable_windowed_traceback=False,
-    argv_emulation=False,
     target_arch='x86_64',
-    codesign_identity=None,
-    entitlements_file=None,
     icon=str(ROOT / 'resources' / 'pet_idle.png'),
 )
