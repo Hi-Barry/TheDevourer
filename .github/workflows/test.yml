@@ -51,15 +51,38 @@ jobs:
         run: |
           python -c "import PyInstaller; print(f'PyInstaller {PyInstaller.__version__}')"
           python -c "import PySide6; print('PySide6 OK')"
-          python -c "from docx import Document; print('python-docx OK')"
           python -c "from PIL import Image; print('Pillow OK')"
-          echo "Spec 文件存在:"
-          if (Test-Path "tools\pyinstaller_win.spec") { echo "  ✅ tools\pyinstaller_win.spec" }
+          echo "Spec 文件存在: $(if(Test-Path tools/pyinstaller_win.spec){'✅ yes'}else{'❌ no'})"
 
-      - name: PyInstaller 打包（详细日志）
+      - name: 测试 PyInstaller 基本打包（验证环境）
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          echo "尝试基础打包..."
+          pyinstaller --onefile --noconsole --name TheDevourer_test `
+            --hidden-import PySide6.QtCore --hidden-import PySide6.QtGui `
+            --hidden-import PySide6.QtWidgets `
+            --add-data "resources;resources" `
+            main.py 2>&1 | Select-String -Pattern "(error|Error|ERROR|FAIL|fail|traceback|Traceback)" -SimpleMatch
+          echo "Exit code: $LASTEXITCODE"
+          if (Test-Path "dist/TheDevourer_test.exe") {
+            $size = (Get-Item "dist/TheDevourer_test.exe").Length
+            echo "✅ 基础打包成功: $([math]::Round($size/1MB, 1)) MB"
+          }
+
+      - name: PyInstaller 完整打包（spec 文件）
         shell: pwsh
         run: |
-          pyinstaller --log-level DEBUG tools\pyinstaller_win.spec 2>&1
+          echo "开始 spec 打包..."
+          $output = pyinstaller tools/pyinstaller_win.spec 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            echo "=== 错误日志 ==="
+            $output | Select-String -Pattern "(error|Error|ERROR|FAIL|fail|traceback|Traceback|exception)" -SimpleMatch
+            echo "=== 最后 50 行 ==="
+            $output | Select-Object -Last 50
+            exit 1
+          }
+          echo "✅ 打包完成"
 
       - name: 检查打包产物
         shell: pwsh
