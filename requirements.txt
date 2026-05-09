@@ -1,0 +1,48 @@
+﻿# 大嘴怪桌面小宠物 — 依赖清单
+# Python >= 3.10
+
+# GUI 框架
+PySide6>=6.5.0
+
+# 文件类型识别
+python-magic>=0.4.27
+python-magic-bin>=0.4.14; sys_platform == 'win32'
+
+# 文档解析
+python-docx>=1.0.0
+openpyxl>=3.1.0
+python-pptx>=0.6.23
+PyPDF2>=3.0.0
+pdfplumber>=0.10.0
+
+# 图片处理
+Pillow>=10.0.0
+
+# OCR（可选依赖，首次运行提示安装）
+pytesseract>=0.3.10
+
+# 文件监听
+watchdog>=4.0.0
+
+# 向量存储与嵌入
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+
+# 文本分块（用于知识库）
+langchain-text-splitters>=0.2.0
+
+# LLM 调用
+httpx>=0.25.0       # HTTP 客户端
+openai>=1.0.0       # OpenAI 兼容 API
+sseclient-py>=1.8.0 # 流式响应
+
+# 网络请求
+urllib3>=2.0.0
+beautifulsoup4>=4.12.0  # URL 标题提取
+
+# 工具
+pyyaml>=6.0         # 配置文件解析
+chardet>=5.0.0      # 编码检测
+
+# 打包
+pyinstaller>=6.0.0  # 最终打包时使用
