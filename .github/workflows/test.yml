@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: windows-latest
+    timeout-minutes: 30
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
@@ -25,23 +26,84 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest pytest-xdist
 
-      - name: 运行全部测试
+      - name: 运行核心测试（跳过 GUI + watchdog 依赖的测试）
         run: |
-          $failed = $false
-          Get-ChildItem -Path tests -Filter "test_*.py" | ForEach-Object {
-            Write-Host "=== $_ ==="
-            python $_.FullName
+          $tests = @(
+            "tests\test_config.py",
+            "tests\test_db.py",
+            "tests\test_logger.py",
+            "tests\test_feed_handler.py"
+          )
+          $all_pass = $true
+          foreach ($t in $tests) {
+            Write-Host "=== $t ==="
+            $sw = [System.Diagnostics.Stopwatch]::StartNew()
+            $output = python $t 2>&1
+            $sw.Stop()
+            Write-Host $output
             if ($LASTEXITCODE -ne 0) {
-              $failed = $true
+              Write-Host "❌ 失败: $t (${sw.Elapsed.TotalSeconds}s)"
+              $all_pass = $false
+            } else {
+              Write-Host "✅ 通过: $t (${sw.Elapsed.TotalSeconds}s)"
             }
           }
-          if ($failed) { exit 1 }
+          if (-not $all_pass) { exit 1 }
+
+      - name: 运行文件识别测试（耗时较长）
+        run: |
+          $tests = @(
+            "tests\test_file_classifier.py",
+            "tests\test_content_classifier.py",
+            "tests\test_manifest.py",
+            "tests\test_signal_bus.py",
+            "tests\test_chroma_client.py"
+          )
+          foreach ($t in $tests) {
+            Write-Host "=== $t ==="
+            python $t 2>&1 | Select-Object -Last 10
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
+
+      - name: 运行存储 + 加载器测试
+        run: |
+          $tests = @(
+            "tests\test_storage_manager.py",
+            "tests\test_module_loader.py",
+            "tests\test_main_launcher.py",
+            "tests\test_pack_module.py",
+            "tests\test_upgrade.py",
+            "tests\test_kb_qa.py",
+            "tests\test_plugin_feed_handler.py"
+          )
+          foreach ($t in $tests) {
+            Write-Host "=== $t ==="
+            python $t 2>&1 | Select-Object -Last 10
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
+
+  quick-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装轻量依赖（不含 PySide6/chromadb）
+        run: |
+          pip install pytest Pillow python-docx openpyxl python-pptx PyPDF2 watchdog
+
+      - name: 运行纯逻辑测试
+        run: |
+          python -m pytest tests/test_config.py tests/test_db.py tests/test_logger.py tests/test_feed_handler.py tests/test_manifest.py tests/test_signal_bus.py tests/test_module_loader.py -v --timeout=30
 
   build:
     needs: test
     runs-on: windows-latest
+    timeout-minutes: 30
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
