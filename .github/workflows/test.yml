@@ -1,4 +1,4 @@
-name: CI — Windows 测试 + 打包
+name: CI — Linux 测试 + Windows 打包
 
 on:
   push:
@@ -7,10 +7,11 @@ on:
     branches: [main]
 
 jobs:
-  # ── Linux 快速逻辑测试（不含 PySide6/GUI）──────
-  quick-test:
+  # ── Linux 完整测试 ─────────────────────────────
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,59 +20,16 @@ jobs:
 
       - name: 安装依赖
         run: |
-          pip install watchdog chromadb Pillow python-docx openpyxl python-pptx PyPDF2
+          pip install watchdog Pillow python-docx openpyxl python-pptx PyPDF2
 
-      - name: 运行纯逻辑测试（不含 GUI 依赖）
+      - name: 运行全部测试（逐个执行，超时控制）
         run: |
-          for f in tests/test_config.py tests/test_db.py tests/test_logger.py tests/test_manifest.py tests/test_signal_bus.py tests/test_module_loader.py tests/test_pack_module.py tests/test_upgrade.py; do
-            echo "=== $f ==="
-            timeout 60 python "$f" || exit 1
+          for f in tests/test_*.py; do
+            echo "=== $(basename $f) ==="
+            timeout 60 python "$f" && echo "✅ PASS" || { echo "❌ FAIL"; exit 1; }
           done
 
-  # ── Windows 核心测试 ─────────────────────────
-  test:
-    needs: quick-test
-    runs-on: windows-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        python-version: ["3.12"]
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: 安装依赖
-        run: |
-          pip install -r requirements.txt
-
-      - name: 运行服务端测试（不含 GUI）
-        shell: pwsh
-        run: |
-          $tests = @(
-            "tests\test_config.py",
-            "tests\test_db.py",
-            "tests\test_logger.py",
-            "tests\test_manifest.py",
-            "tests\test_signal_bus.py",
-            "tests\test_module_loader.py",
-            "tests\test_pack_module.py",
-            "tests\test_upgrade.py",
-            "tests\test_file_classifier.py",
-            "tests\test_content_classifier.py",
-            "tests\test_storage_manager.py",
-            "tests\test_main_launcher.py",
-            "tests\test_plugin_feed_handler.py"
-          )
-          foreach ($t in $tests) {
-            Write-Host "=== $t ==="
-            python $t
-            if ($LASTEXITCODE -ne 0) { exit 1 }
-          }
-
-  # ── PyInstaller 打包 ──────────────────────────
+  # ── Windows PyInstaller 打包 ──────────────────
   build:
     needs: test
     runs-on: windows-latest
