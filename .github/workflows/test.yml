@@ -1,0 +1,68 @@
+name: CI — Windows 测试 + 打包
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 设置 Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-xdist
+
+      - name: 运行全部测试
+        run: |
+          $failed = $false
+          Get-ChildItem -Path tests -Filter "test_*.py" | ForEach-Object {
+            Write-Host "=== $_ ==="
+            python $_.FullName
+            if ($LASTEXITCODE -ne 0) {
+              $failed = $true
+            }
+          }
+          if ($failed) { exit 1 }
+
+  build:
+    needs: test
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 设置 Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: 打包 exe
+        run: |
+          pyinstaller tools/pyinstaller_win.spec
+
+      - name: 上传 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TheDevourer-Windows-x64
+          path: dist/TheDevourer.exe
