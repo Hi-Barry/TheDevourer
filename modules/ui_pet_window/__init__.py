@@ -21,7 +21,15 @@ def _on_feed_done(data: dict):
 
 
 def create_pet_window(feed_queue=None):
-    """创建精灵窗口（延迟导入 PySide6）"""
+    """创建精灵窗口（延迟导入 PySide6）。feed_queue 可选，默认使用新队列。"""
+    if feed_queue is None:
+        from core.feed_handler import FeedQueueWorker
+        feed_queue = FeedQueueWorker()
+
+    # 连接投喂信号到 UI
+    feed_queue.item_started.connect(lambda item: EventBus().publish("feed/started", item=item))
+    feed_queue.item_finished.connect(lambda item, ok, msg: EventBus().publish("feed/done", item=item, ok=ok, msg=msg))
+
     from ui.pet_window import PetWindow
     return PetWindow(feed_queue=feed_queue)
 

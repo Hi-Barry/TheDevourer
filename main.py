@@ -62,6 +62,44 @@ def main():
 
     if loaded:
         logger.info(f"已加载 {len(loaded)} 个模块: {', '.join(loaded.keys())}")
+
+        # ── 4.5 创建 UI 窗口 ─────────────────────
+        # 通过 ModuleLoader 获取 entry_points，不直接 import
+
+        # 精灵窗口
+        pet_fn = loader.get_entry_point("ui_pet_window", "functions", "create_pet_window")
+        if pet_fn:
+            pet_window = pet_fn()
+            pet_window.show()
+            logger.info("精灵窗口已创建")
+
+        # 内容浏览器
+        browser_fn = loader.get_entry_point("ui_content_browser", "functions", "create_content_browser")
+        if browser_fn:
+            browser = browser_fn(db)
+            pet_window.browser_requested.connect(lambda: browser.show() or browser.raise_())
+            logger.info("内容浏览器已创建")
+
+        # 设置对话框
+        settings_fn = loader.get_entry_point("ui_settings_dialog", "functions", "create_settings_dialog")
+        if settings_fn:
+            settings_dialog = settings_fn()
+            pet_window.settings_requested.connect(settings_dialog.show)
+            logger.info("设置对话框已创建")
+
+        # 提问对话框
+        qa_fn = loader.get_entry_point("ui_question_dialog", "functions", "create_question_dialog")
+        if qa_fn:
+            qa_dialog = qa_fn()
+            pet_window.question_requested.connect(qa_dialog.show)
+            logger.info("提问对话框已创建")
+
+        # 系统托盘
+        tray_fn = loader.get_entry_point("ui_tray", "functions", "create_tray_icon")
+        if tray_fn:
+            tray_icon = tray_fn()
+            logger.info("系统托盘已创建")
+
     else:
         logger.info("无可用模块，以核心模式运行")
 
